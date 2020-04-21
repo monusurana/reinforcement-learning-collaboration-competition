@@ -81,7 +81,9 @@ Max number of steps in an episode = 1000
 ```
 ## Results
 
-We were able to achieve the score of 0.5 in 938 episodes
+I was able to achieve the score of 0.5 in 938 episodes
+
+<img src="resources/maddpg_score.png">
 
 ### Observations 
 * Batch Normalization and slowing the learning rate helped with faster training 
