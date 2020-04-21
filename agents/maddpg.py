@@ -36,6 +36,13 @@ class MADDPG:
             torch.save(self.maddpg_agents[i].actor_local.state_dict(), 'models/checkpoint_actor_{}_final.pth'.format(i))
             torch.save(self.maddpg_agents[i].critic_local.state_dict(), 'models/checkpoint_critic_{}_final.pth'.format(i))
 
+    def load(self):
+        for i in range(len(self.maddpg_agents)):
+            actor_file = 'models/checkpoint_actor_{}_final.pth'.format(i)
+            critic_file = 'models/checkpoint_critic_{}_final.pth'.format(i)
+            self.maddpg_agents[i].actor_local.load_state_dict(torch.load(actor_file))
+            self.maddpg_agents[i].critic_local.load_state_dict(torch.load(critic_file))
+
     def reset(self):
         for agent in self.maddpg_agents:
             agent.reset()
