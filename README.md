@@ -49,5 +49,6 @@ The trained agents would automatically get saved in ```models/``` folder for the
 - ```buffers``` contains the code for replay buffer which all the algorithms use 
 - ```models``` contains the saved models generates by the code 
 - ```networks``` contains the code for neural networks being used by all the algorithms 
+- ```noise``` contains all the noise models related with project
 - ```resources``` contains all the resources related with project
   
