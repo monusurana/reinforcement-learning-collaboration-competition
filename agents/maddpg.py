@@ -31,6 +31,11 @@ class MADDPG:
         self.update_every = UPDATE_EVERY
         self.num_updates = NUM_UPDATES
 
+    def save(self):
+        for i in range(len(self.maddpg_agents)):
+            torch.save(self.maddpg_agents[i].actor_local.state_dict(), 'models/checkpoint_actor_{}_final.pth'.format(i))
+            torch.save(self.maddpg_agents[i].critic_local.state_dict(), 'models/checkpoint_critic_{}_final.pth'.format(i))
+
     def reset(self):
         for agent in self.maddpg_agents:
             agent.reset()
