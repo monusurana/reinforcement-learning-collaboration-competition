@@ -2,13 +2,13 @@
 
 ## Implementation Details 
 
-Implemented and trained MADDPG algorithm for solving Reacher environment. Here's the gif of trained agent
+Implemented and trained MADDPG algorithm for solving Tennis environment. Here's the gif of the trained agent
 
 ![MADDPG Trained Agent](resources/trained_agent.gif)
 
-### DDPG 
+### MADDPG 
 
-The implementation of dqn is in ```agents/maddpg.py``` and the trained model fro both the agents can be found at
+The implementation of dqn is in ```agents/maddpg.py``` and the trained model for both the agents can be found at
 * ```models/checkpoint_actor_0_final.pth```
 * ```models/checkpoint_actor_1_final.pth```
 * ```models/checkpoint_critic_0_final.pth```
@@ -16,7 +16,7 @@ The implementation of dqn is in ```agents/maddpg.py``` and the trained model fro
 
 It is inspired by the original paper and here's the snapshot of the algorithm from the paper:
 
-![DDPG Algorithm](resources/maddpg.png)
+![MADDPG Algorithm](resources/maddpg.png)
 
 #### Actor Architecture
 ```
@@ -33,20 +33,35 @@ Actor(
 Critic(
   (fcs1): Linear(in_features=24, out_features=512, bias=True)
   (bn1): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
-  (fc2): Linear(in_features=514, out_features=256, bias=True)
+  (fc2): Linear(in_features=512, out_features=256, bias=True)
   (fc3): Linear(in_features=256, out_features=1, bias=True)
 )
 ```
 
 These are other the key pieces of the algorithm:
 
-### Experience Replay 
+### Shared Experience Replay Buffer
 
 Experience replay allows the RL agent to learn from past experiences. Each experience is stored in a replay buffer as the agent interacts with the environment. The replay buffer contains experience tuples with the state, action, reward, and next state ```(s, a, r, s')```. The agent randomly samples from this buffer as part of the training. Random samplaing helps with the problem of correlated data. This prevents action values from oscillating, since a naive Q-learning algorithm could otherwise become biased by correlations between sequential experience tuples.
 
 Also, experience replay improves learning through repetition. By doing multiple passes over the data, our agent has multiple opportunities to learn from a single experience tuple. This is particularly useful for state-action pairs that occur infrequently within the environment.
 
 The implementation of the replay buffer can be found here in the ```buffers/ReplayBuffer.py``` file of the source code.
+
+In order to solve **Multi-Agent** problem I used shared experience replay buffer. The experience tuples from both the agents were added to the buffer and for the learning part agents would then sample from the shared buffer. Here's the step function in ```agents/maddpg.py``` highlighting the piece where experiences got added into a shared buffer. 
+
+```
+    def step(self, states, actions, rewards, next_states, dones):
+        for s,a,r,ns,d in zip(states, actions, rewards, next_states, dones):
+            self.memory.add(s,a,r,ns,d)
+            
+        self.t_step = (self.t_step + 1) % self.update_every
+        if self.t_step == 0 and len(self.memory) > self.batch_size:
+            for _ in range(self.num_updates):
+                for agent in self.maddpg_agents:
+                    experiences = self.memory.sample()
+                    agent.learn(experiences, self.gamma)
+```
 
 ### Target Network 
 
@@ -73,6 +88,8 @@ LR_ACTOR = 1e-4         # learning rate of the actor
 LR_CRITIC = 3e-4        # learning rate of the critic
 WEIGHT_DECAY = 0        # L2 weight decay
 ```
+
+I used a larger learning rate of ```3e-4``` for Critic compared to Actor's ```1e-4```, as this allows Crtic to learn faster than the Actor, since Actor relies on crtic for learning. 
 
 The training part uses these paramters
 ```
