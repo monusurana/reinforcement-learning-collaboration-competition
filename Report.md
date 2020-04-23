@@ -8,6 +8,8 @@ Implemented and trained MADDPG algorithm for solving Tennis environment. Here's 
 
 ### MADDPG 
 
+I used [DDPG](https://arxiv.org/pdf/1509.02971.pdf), a policy based method, which is well suited for continuous action spaces to solve this problem. DDPG can be viewed as an extension of Deep Q-learning to continuous tasks. In order to make it work for the Multi-Agent setting I extended the original DDPG by including a shared experience replay buffer inspired by [MADDPG](https://arxiv.org/pdf/1706.02275.pdf) paper.
+
 The implementation of maddpg is in ```agents/maddpg.py``` and the trained model for both the agents can be found at
 * ```models/checkpoint_actor_0_final.pth```
 * ```models/checkpoint_actor_1_final.pth```
@@ -40,7 +42,7 @@ Critic(
 
 I used pretty simple 2-layer neural network for both Actor & Critic. For Actor the network has 24 units in the input layer, 512 in the first hidden layer, 256 units in the second hidden layer, and 2 units in the output layer. And for Critic 24 units in the input layer, 514 in the first hidden layer, 256 units in the second hidden layer, and 1 unit in the output layer.
 
-I also used Batch Normalization which helped with faster training and increases the stability during the training process.
+I also used **Batch Normalization** which helped with faster training and increases the stability during the training process.
 
 The networks are defined in ```networks\model.py```
 
